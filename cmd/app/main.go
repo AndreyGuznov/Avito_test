@@ -1,5 +1,9 @@
 package main
 
-func main() {
+import (
+	"app/internal/usecase/app"
+)
 
+func main() {
+	app.Run()
 }

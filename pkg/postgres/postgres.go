@@ -1,25 +1,30 @@
 package postgres
 
 import (
+	"app/config"
+	"app/pkg/logger"
 	"fmt"
 	"sync"
+
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 var (
-	conn   *SQLDB
-	connMx = &sync.Mutex{}
+	conn *SQLDB
 )
 
+// GetConn ...
 func GetConn() *SQLDB {
+	connMx := &sync.Mutex{}
 	connMx.Lock()
 	defer connMx.Unlock()
-
 	if conn == nil {
 		var err error
 
-		conn, err = Init(config.Get("USER"), config.Get("PASSWORD"), config.Get("NAME"), config.Get("HOST"))
+		conn, err = Init()
 		if err != nil {
-			log.Err("Error initializing DB", err)
+			logger.Err("Error initializing DB", err)
 			return nil
 		}
 	}
@@ -32,10 +37,10 @@ type SQLDB struct {
 	Instance *sqlx.DB
 }
 
-func doInit(user string, password string, database string, host string) (*SQLDB, error) {
-	addr := fmt.Sprintf("host=%s port=%d user=%s "+
+func doInit() (*SQLDB, error) {
+	addr := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",
-		host, 5432, user, password, database)
+		config.Get("HOST"), config.Get("DBPORT"), config.Get("USER"), config.Get("PASSWORD"), config.Get("NAME"))
 
 	instance, err := sqlx.Open("postgres", addr)
 	if err != nil {
@@ -50,17 +55,17 @@ func doInit(user string, password string, database string, host string) (*SQLDB,
 }
 
 // Init inits DB
-func Init(user string, password string, database string, host string) (*SQLDB, error) {
+func Init() (*SQLDB, error) {
 	var dbsess *SQLDB
 	var err error
 
-	dbsess, err = doInit(user, password, database, host)
+	dbsess, err = doInit()
 	if err != nil {
-		log.Err("Failed to connect to Postgres", err)
+		logger.Err("Failed to connect to Postgres", err)
 		return nil, err
 	}
 
-	log.Info("Connected to Postgres database")
+	logger.Info("Connected to Postgres database")
 	return dbsess, nil
 }
 

@@ -1,13 +1,10 @@
 package config
 
-package config
-
 import (
+	"app/pkg/logger"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
-	"weather/tool/log"
 
 	"github.com/joho/godotenv"
 )
@@ -22,7 +19,7 @@ func init() {
 		}
 	}
 
-	log.Debug(fmt.Sprintf(".env files not found (lookup paths: %s)", strings.Join(envPaths, ", ")))
+	logger.Debug(fmt.Sprintf(".env files not found (lookup paths: %s)", strings.Join(envPaths, ", ")))
 }
 
 // Get config value as a string
@@ -57,22 +54,22 @@ func GetOptional(name string) (val string, ok bool) {
 
 // GetInt returns config value as integer
 func GetInt(name string, def ...int) int {
-	val := Get(name, "")
+	// val := Get(name, "")
 
-	if val == "" {
-		if len(def) == 0 {
-			panic(fmt.Sprintf("Environment variable %s is not set", name))
-		}
+	// if val == "" {
+	// 	if len(def) == 0 {
+	// panic(fmt.Sprintf("Environment variable %s is not set", name))
+	// 	}
 
-		return def[0]
-	}
+	// 	return def[0]
+	// }
 
-	res, err := strconv.Atoi(val)
-	if err != nil {
-		panic(fmt.Sprintf("Environment variable %s: %s is not int: %v", name, val, err))
-	}
-
-	return res
+	// res, err := strconv.Atoi(val)
+	// if err != nil {
+	// 	panic(fmt.Sprintf("Environment variable %s: %s is not int: %v", name, val, err))
+	// }
+	// return res
+	return 5
 }
 
 // GetBool returns config value as boolean
